@@ -40,9 +40,9 @@ jobs:
     - name: Stage artifacts in workspace
       run: |
         mkdir artifacts
-        cp pawn/build/install/bin/pawncc      artifacts/
-        cp pawn/build/install/lib/libpawnc.so artifacts/
-        cp pawn/build/install/bin/pawndisasmsm artifacts/
+        cp /home/runner/work/compiler/pawn/build/install/bin/pawncc      artifacts/
+        cp /home/runner/work/compiler/pawn/build/install/bin/pawndisasm artifacts/
+        cp /home/runner/work/compiler/pawn/build/install/lib/libpawnc.so artifacts/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
