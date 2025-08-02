@@ -37,12 +37,16 @@ jobs:
       working-directory: ../pawn/build
       run: make install
 
+    - name: Stage artifacts in workspace
+      run: |
+        mkdir artifacts
+        cp pawn/build/install/bin/pawncc      artifacts/
+        cp pawn/build/install/lib/libpawnc.so artifacts/
+        cp pawn/build/install/bin/pawndisasmsm artifacts/
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: pawn-compiler-aarch64-v3.10.8
-        path: |
-          ../pawn/build/install/bin/pawncc
-          ../pawn/build/install/lib/libpawnc.so
-          ../pawn/build/install/bin/pawndisasmsm
+        path: artifacts/
         retention-days: 90
