@@ -13,8 +13,7 @@ jobs:
     steps:
     - name: Clone upstream repo + checkout tag v3.10.8
       run: |
-        git clone --depth 1 --branch v3.10.8 https://github.com/pawn-lang/compiler.git ~/pawn
-        cd ~/pawn
+        git clone --depth 1 --branch v3.10.8 https://github.com/pawn-lang/compiler.git ../pawn
 
     - name: Install cross toolchain
       run: |
@@ -22,7 +21,7 @@ jobs:
         sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
     - name: Configure & build
-      working-directory: ~/pawn
+      working-directory: ../pawn
       run: |
         mkdir build && cd build
         cmake ../source/compiler \
@@ -35,7 +34,7 @@ jobs:
         make -j$(nproc)
 
     - name: Install binaries
-      working-directory: ~/pawn/build
+      working-directory: ../pawn/build
       run: make install
 
     - name: Upload artifacts
@@ -43,7 +42,7 @@ jobs:
       with:
         name: pawn-compiler-aarch64-v3.10.8
         path: |
-          ~/pawn/build/install/bin/pawncc
-          ~/pawn/build/install/lib/libpawnc.so
-          ~/pawn/build/install/bin/pawndisasmsm
+          ../pawn/build/install/bin/pawncc
+          ../pawn/build/install/lib/libpawnc.so
+          ../pawn/build/install/bin/pawndisasmsm
         retention-days: 90
