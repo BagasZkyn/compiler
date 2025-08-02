@@ -1,28 +1,28 @@
 name: Build Pawn compiler (Linux aarch64)
 
 on:
-  workflow_dispatch:           # manual trigger
+  workflow_dispatch:
   push:
     tags:
-      - v3.10.8                # or any tag you want to build automatically
+      - v3.10.8
 
 jobs:
   build:
-    runs-on: ubuntu-latest     # GitHub-hosted x86_64 runner
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
-      with:
-        ref: v3.10.8           # exact tag
-
-    - name: Set up cross-toolchain
+    - name: Clone upstream repo + checkout tag v3.10.8
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-        sudo ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 || true
+        git clone --depth 1 --branch v3.10.8 https://github.com/pawn-lang/compiler.git ~/pawn
+        cd ~/pawn
 
-    - name: Configure build
+    - name: Install cross toolchain
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+    - name: Configure & build
+      working-directory: ~/pawn
       run: |
         mkdir build && cd build
         cmake ../source/compiler \
@@ -32,13 +32,10 @@ jobs:
           -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=$PWD/install
+        make -j$(nproc)
 
-    - name: Build
-      working-directory: build
-      run: make -j$(nproc)
-
-    - name: Install / stage
-      working-directory: build
+    - name: Install binaries
+      working-directory: ~/pawn/build
       run: make install
 
     - name: Upload artifacts
@@ -46,7 +43,7 @@ jobs:
       with:
         name: pawn-compiler-aarch64-v3.10.8
         path: |
-          build/install/bin/pawncc
-          build/install/lib/libpawnc.so
-          build/install/bin/pawndisasmsm
+          ~/pawn/build/install/bin/pawncc
+          ~/pawn/build/install/lib/libpawnc.so
+          ~/pawn/build/install/bin/pawndisasmsm
         retention-days: 90
